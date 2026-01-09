@@ -159,7 +159,7 @@ h1 {
   margin: 20px;
 
   @media (max-width: 600px) {
-    /* Switches to 2 columns on tablets/desktop */
+    
     flex-direction: column;
   }
 
