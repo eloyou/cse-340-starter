@@ -54,7 +54,7 @@ body {
   max-width: 800px;
   width: 100%;
   background-color: rgb(255, 255, 255);
-  border: 8px blueviolet solid;
+  border: 8px rgb(43, 177, 226) solid;
 
 }
 
@@ -218,4 +218,12 @@ footer {
 @media (max-width: 600px) {
     
     .product {flex-direction: column;}
+
+    body {
+      background: none;
+    }
+
+    .box {
+      border: none;
+    }
 }
