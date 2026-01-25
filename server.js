@@ -29,14 +29,19 @@ app.set("layout", "./layouts/layout")
 app.use(static)
 
 app.get("/", utilities.handleErrors(baseController.buildHome))
-app.get('/error500', (req, res, next) => {
-  next({status: 500, message: 'Internal Service Error'})
+app.get("/error500", ( req, res, next) => {
+  let err = new Error("Internal Service Error");
+  err.status = 500;
+  next(err);
+
 })
 
 app.use("/inv", inventoryRoute)
 app.use(async (req, res, next) => {
   next({status: 404, message: 'Sorry, we appear to have lost that page.'})
 })
+
+
 
 
 /* ***********************
@@ -47,13 +52,14 @@ app.use(async (req, res, next) => {
 app.use(async (err, req, res, next) => {
   let nav = await utilities.getNav()
   console.error(`Error at: "${req.originalUrl}": ${err.message}`)
-  if(err.status == 404){ 
+
+  if (err.status == 404){ 
     message = err.message
-  } else if (err.status == 500) {
-    message = err.message
-  } else {message = 'Oh no! There was a crash. Maybe try a different route?'}
+  } else {
+    message = err.message || 'Oh no! There was a crash. Maybe try a different route?'
+  }
   res.render("errors/error", {
-    title: err.status || 'Server Error',
+    title: err.status,
     message,
     nav
   })

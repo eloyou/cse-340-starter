@@ -59,7 +59,7 @@ Util.buildInventoryGrid = async function(data) {
   let grid
   grid = '<div class="inventory-card">'
   grid += '<img src="' + data[0].inv_image
-  + '" alt="image of' + data[0].inv_make + ' ' + data[0].inv_model
+  + '" alt="image of ' + data[0].inv_make + ' ' + data[0].inv_model
   + '">'
   grid += '<div class="inventory-text">'
   grid += '<h2>' + data[0].inv_make + ' ' + data[0].inv_model + ' details' + '</h2>'
