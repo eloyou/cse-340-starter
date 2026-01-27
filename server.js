@@ -13,6 +13,7 @@ const static = require("./routes/static")
 const baseController = require("./controllers/baseController")
 const inventoryRoute = require("./routes/inventoryRoute")
 const utilities = require("./utilities")
+const errorRoute = require("./routes/errorRoute")
 
 
 /* **************************
@@ -23,20 +24,17 @@ app.set("view engine", "ejs")
 app.use(expressLayouts)
 app.set("layout", "./layouts/layout")
 
+
 /* ***********************
  * Routes
  *************************/
 app.use(static)
 
 app.get("/", utilities.handleErrors(baseController.buildHome))
-app.get("/error500", ( req, res, next) => {
-  let err = new Error("Internal Service Error");
-  err.status = 500;
-  next(err);
 
-})
 
 app.use("/inv", inventoryRoute)
+app.use(errorRoute)
 app.use(async (req, res, next) => {
   next({status: 404, message: 'Sorry, we appear to have lost that page.'})
 })
