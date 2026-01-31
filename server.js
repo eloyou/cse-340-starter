@@ -14,6 +14,9 @@ const baseController = require("./controllers/baseController")
 const inventoryRoute = require("./routes/inventoryRoute")
 const utilities = require("./utilities")
 const errorRoute = require("./routes/errorRoute")
+const session = require("express-session")
+const pool = require("./database/")
+const bodyParser = require("body-parser")
 
 
 /* **************************
@@ -24,6 +27,29 @@ app.set("view engine", "ejs")
 app.use(expressLayouts)
 app.set("layout", "./layouts/layout")
 
+app.use(session({
+  store: new (require('connect-pg-simple')(session))({
+    createTableIfMissing: true,
+    pool,
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: true,
+  saveUninitialized: true,
+  name: 'sessionId'
+  
+}))
+
+app.use(require('connect-flash')())
+
+app.use((req, res, next) => {
+  res.locals.messages = require('express-messages')(req,res)
+  next()
+})
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({
+  extended: true
+}))
 
 /* ***********************
  * Routes
@@ -35,6 +61,7 @@ app.get("/", utilities.handleErrors(baseController.buildHome))
 
 app.use("/inv", inventoryRoute)
 app.use(errorRoute)
+app.use('/account', require("./routes/accountRoute"))
 app.use(async (req, res, next) => {
   next({status: 404, message: 'Sorry, we appear to have lost that page.'})
 })

@@ -40,8 +40,92 @@ invCont.buildByInventoryId = async function (req, res, next) {
         grid,
     })
 
+}
 
+invCont.buildManagement = async function (req, res, next) {
+    let nav = await utilities.getNav()
+    res.render("inventory/management", {
+        title: "Management",
+        nav,
+        errors: null
+
+    }) 
+}
+
+invCont.buildAddClassification = async function (req, res, next) {
+    let nav = await utilities.getNav()
+    res.render("inventory/add-classification", {
+        title: "Add Classification",
+        nav,
+        errors: null
+    })
+}
+
+invCont.registerClassification = async function (req, res, next) {
+    let nav = await utilities.getNav()
+    const { classification_name } = req.body
+
+    const regClass = await invModel.postNewClassificationName(classification_name)
+
+    if (regClass) {
+        req.flash(
+            "notice",
+            `Successfully, add ${classification_name}.`
+        )
+        
+        res.status(201).render("inventory/management", {
+            title: "Management",
+            nav,
+            errors: null
+        })
+    } else {
+        req.flash("notice", "Sorry the registration failed.")
+        res.status(501).render("inventory/add-classification", {
+            title: "Add Classification",
+            nav,
+            errors: null,
+        })
+    }
 
 }
 
+invCont.buildAddInventory = async function (req, res, next) {
+    let nav = await utilities.getNav()
+    let classNames = await utilities.buildClassificationList()
+    res.render("inventory/add-inventory", {
+        title: "Add Inventory",
+        nav,
+        classNames,
+        errors: null,
+    })
+}
+
+invCont.registerInventory = async function (req, res, next) {
+    const { inv_make, inv_model, inv_year, inv_description, inv_image, inv_thumbnail, inv_price, inv_miles, inv_color, classification_id } = req.body
+    let nav = await utilities.getNav()
+    let classNames = await utilities.buildClassificationList(classification_id)
+    const regInv = await invModel.postNewInventory(inv_make, inv_model, inv_year, inv_description, inv_image, inv_thumbnail, inv_price, inv_miles, inv_color, classification_id )
+
+    if (regInv) {
+        req.flash(
+            "notice",
+            `Successfully, add ${inv_make + " " + inv_model + " " + inv_year}.`
+        )
+        
+        res.status(201).render("inventory/management", {
+            title: "Management",
+            nav,
+            errors: null
+        })
+    } else {
+        req.flash("notice", "Sorry the registration failed.")
+        res.status(501).render("inventory/add-inventory", {
+            title: "Add Inventory",
+            nav,
+            classNames,
+            errors: null,
+        })
+    }
+    
+}
 module.exports = invCont
