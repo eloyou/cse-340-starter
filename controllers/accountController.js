@@ -158,14 +158,14 @@ async function updateAccount(req, res) {
 
     if (account_firstname === accountData.account_firstname && account_lastname === accountData.account_lastname && account_email === accountData.account_email) {
         req.flash("notice", "No changes detected")
-        res.redirect(`/account/edit/${account_id}`)
+        return res.redirect(`/account/edit/${account_id}`)
     } 
 
     const updateResult = await accountModel.updateAccount(account_id, account_firstname, account_lastname, account_email)
 
     if (updateResult) {
         req.flash("notice", "Updated successfully")
-        res.redirect(`/account/${account_id}`)
+        return res.redirect(`/account/${account_id}`)
     } else {
         let nav = await utilities.getNav()
         res.render("account/edit-account", {
