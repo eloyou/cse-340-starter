@@ -1,0 +1,28 @@
+<% if (title) {%>
+<h1><%= title %></h1>
+<% } %>
+
+<%- messages() %>
+
+<% if (errors) { %>
+  <ul class="notice">
+ <% errors.array().forEach(error => { %>
+   <li><%= error.msg %></li>
+<%  }) %>
+ </ul>
+<% } %>
+
+<div class="account-management">
+    <h2>Welcome <%= locals.account_firstname %></h2>
+    <p>You are logged in.</p>
+    <a href="/account/edit/<%= locals.account_id%>">Edit Account Information</a>
+
+    <hr>
+    
+    <% let role = locals.accountData.account_type %>
+    <% if (role == "Admin" || role == "Employee") { %>
+        <h2>Inventory Management</h2>
+        <a href="/inv/">Manage Inventory</a>
+    <% } %>
+
+</div>

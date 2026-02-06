@@ -17,3 +17,19 @@
   <a href="/inv/add-inventory">Add New Inventory</a>
 
 </div>
+
+<div class="manage-box">
+  <h2>Manage Inventory</h2>
+  <p>Select Classification:</p>
+
+  <% if (classificationList) {%>
+          <%- classificationList %>
+  <% } %>
+
+<table id="inventoryDisplay"></table>
+
+</div>
+
+
+<noscript>JavaScript must be enabled to use this page.</noscript>
+<script src="../../js/inventory.js"></script>

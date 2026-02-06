@@ -1,5 +1,8 @@
 const invModel = require("../models/inventory-model")
 const Util = {}
+const jwt = require("jsonwebtoken")
+require("dotenv").config()
+const accountModel = require("../models/account-model")
 
 /* ************************
  * Constructs the nav HTML unordered list
@@ -58,15 +61,15 @@ Util.buildClassificationGrid = async function(data){
 Util.buildInventoryGrid = async function(data) {
   let grid
   grid = '<div class="inventory-card">'
-  grid += '<img src="' + data[0].inv_image
-  + '" alt="image of ' + data[0].inv_make + ' ' + data[0].inv_model
+  grid += '<img src="' + data.inv_image
+  + '" alt="image of ' + data.inv_make + ' ' + data.inv_model
   + '">'
   grid += '<div class="inventory-text">'
-  grid += '<h2>' + data[0].inv_make + ' ' + data[0].inv_model + ' details' + '</h2>'
-  grid += '<p>' + '<strong>Price:</strong>' + ' $' + new Intl.NumberFormat('en-US').format(data[0].inv_price) + '</p>'
-  grid += '<p>' + '<strong>Description:</strong>' + ' ' + data[0].inv_description + '</p>'
-  grid += '<p>' + '<strong>Color:</strong>' + ' ' + data[0].inv_color + '</p>'
-  grid += '<p>' + '<strong>Miles:</strong>' + ' ' + data[0].inv_miles.toLocaleString() + '</p>'
+  grid += '<h2>' + data.inv_make + ' ' + data.inv_model + ' details' + '</h2>'
+  grid += '<p>' + '<strong>Price:</strong>' + ' $' + new Intl.NumberFormat('en-US').format(data.inv_price) + '</p>'
+  grid += '<p>' + '<strong>Description:</strong>' + ' ' + data.inv_description + '</p>'
+  grid += '<p>' + '<strong>Color:</strong>' + ' ' + data.inv_color + '</p>'
+  grid += '<p>' + '<strong>Miles:</strong>' + ' ' + data.inv_miles.toLocaleString() + '</p>'
   grid += '</div>'
   grid += '</div>'
 
@@ -93,4 +96,57 @@ Util.buildClassificationList = async function (classification_id = null) {
     return classificationList
   }
 
+Util.checkJWTToken = (req, res, next) => {
+  if (req.cookies.jwt) {
+    jwt.verify(
+      req.cookies.jwt,
+      process.env.ACCESS_TOKEN_SECRET,
+      function (err, accountData) {
+        if (err) {
+          req.flash("Please Log in")
+          res.clearCookie("jwt")
+          return res.redirect("/account/login")
+        }
+
+        res.locals.accountData = accountData
+        res.locals.loggedin = 1
+        next()
+      }
+    )
+  } else {
+    next()
+  }
+}
+
+Util.checkLogin = (req, res, next) => {
+  if (res.locals.loggedin) {
+    next()
+  } else {
+    req.flash("notice", "Please Log in.")
+    return res.redirect("/account/login")
+  }
+}
+
+Util.getUser = async (req, res, next) => {
+  if (res.locals.loggedin) {
+    const userData = await accountModel.getAccountById(res.locals.accountData.account_id)
+    res.locals.user = userData
+    next()
+  } else {
+    res.locals.user = null
+    return next()
+  }
+  
+}
+
+Util.checkAdmin = (req, res, next) => {
+  const role = res.locals.accountData.account_type
+  if (role == "Admin" || role == "Employee" ) {
+    next()
+  } else {
+    req.flash("notice", "Please Log in as Admin or Employee")
+    return res.redirect("/account/login")
+    
+  }
+}
 module.exports = Util
