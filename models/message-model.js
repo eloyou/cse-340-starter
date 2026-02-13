@@ -11,8 +11,8 @@ async function getMessagesBySenderId(account_id) {
             m.message_id,
             a.account_firstname,
             a.account_lastname
-        FROM message m
-        JOIN account a
+        FROM public.message m
+        JOIN public.account a
             ON m.message_from = a.account_id
         WHERE m.message_to = $1
         `
@@ -43,7 +43,7 @@ async function getUserList() {
 
 async function postMessage(message_subject, message_body, message_to, message_from) {
     try {
-        const sql = "INSERT INTO message (message_subject, message_body, message_to, message_from) VALUES ($1, $2, $3, $4) RETURNING *"
+        const sql = "INSERT INTO public.message (message_subject, message_body, message_to, message_from) VALUES ($1, $2, $3, $4) RETURNING *"
         const data = await pool.query(sql, [message_subject, message_body, message_to, message_from])
 
         return data
@@ -68,8 +68,8 @@ async function getMessageByMsgId(message_id) {
             a.account_firstname,
             a.account_lastname,
             a.account_id
-        FROM message m
-        JOIN account a
+        FROM public.message m
+        JOIN public.account a
             ON m.message_from = a.account_id
         WHERE m.message_id = $1 
         `
@@ -87,7 +87,7 @@ async function getMessageByMsgId(message_id) {
 async function updateMessageAsRead(msg_id) {
     try {
         const sql = `
-            UPDATE message SET message_read = NOT message_read WHERE message_id = $1 RETURNING *
+            UPDATE public.message SET message_read = NOT message_read WHERE message_id = $1 RETURNING *
         
         `
 
@@ -104,7 +104,7 @@ async function updateMessageAsRead(msg_id) {
 async function updateArchiveRead(msg_id) {
     try {
         const sql = `
-            UPDATE message SET message_archive = NOT message_archive WHERE message_id = $1 RETURNING *
+            UPDATE public.message SET message_archive = NOT message_archive WHERE message_id = $1 RETURNING *
         
         `
 
@@ -121,7 +121,7 @@ async function updateArchiveRead(msg_id) {
 async function deleteMessage(msg_id) {
     try {
         const sql = `
-            DELETE FROM message WHERE message_id = $1 RETURNING *
+            DELETE FROM public.message WHERE message_id = $1 RETURNING *
         
         `
 
