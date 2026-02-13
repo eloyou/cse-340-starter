@@ -479,19 +479,118 @@ input:focus:valid {
   padding: 1rem;
 }
 
-.manage-box table {
+
+.manage-box table , .message-table{
+
   width: 100%;
   border-collapse: separate;
   font-family: system-ui, sans-serif;
   font-size: 0.95rem;
   border: 2px solid #1d1b1b;
   border-radius: 12px;
-  overflow: hidden;
 }
 
-.manage-box td {
+.manage-box td , .message-table{
   padding: 12px;
   border-top: 1px solid #eee;
+}
+
+
+.message-table th {
+  text-align: left;
+  padding: 10px;
+}
+
+.message-table tr td {
+  padding: 5px;
+}
+
+.message-table tr:nth-child(odd) {
+  background-color: #b6b6b6;
+}
+
+.message-table tbody tr:hover {
+  background-color: #e47676;
+}
+
+.message-table th {
+  background-color: white;
+}
+.empty-inbox {
+  text-align: center;
+  height: 300px;
+  font-size: 2rem;
+
+
+}
+
+.inbox {
+  margin: 20px;
+}
+
+.inbox li {
+  margin-top: 5px;
+}
+.inbox li a {
+
+  color: black;
+  margin-top: 10px;
+}
+
+.inbox li a::before {
+  content: "📍";
+  opacity: 0;
+}
+
+.inbox li a:hover {
+  text-decoration: underline;
+}
+.inbox li a:hover::before {
+  opacity: 1;
+
+}
+
+
+
+.message-box {
+  margin: 20px;
+}
+.message-box * {
+  display: block;
+}
+
+.message-box label {
+  margin-top: 10px;
+}
+
+.message-box select {
+  font-size: 1.2rem;
+}
+
+.message-box input{
+  width: 100%;
+  max-width: 300px;
+  font-size: 1.2rem;
+  padding: 5px;
+}
+
+.message-box textarea {
+  width: 100%;
+  max-width: 400px;
+  height: 300px;
+  max-height: 300px;
+  padding: 10px;
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+.message-box button {
+  font-size: 1.3rem;
+  padding: 5px;
+}
+
+.stack *{
+  display: block;
 }
 @media (max-width: 600px) {
     

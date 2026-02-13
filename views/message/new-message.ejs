@@ -1,0 +1,35 @@
+<% if (title) {%>
+<h1><%= title %></h1>
+<% } %>
+
+<%- messages() %>
+
+<% if (errors) { %>
+  <ul class="notice">
+ <% errors.array().forEach(error => { %>
+   <li><%= error.msg %></li>
+<%  }) %>
+ </ul>
+<% } %>
+
+<p>This is an internal system only. Recipents are limited to the three generic accounts. </p>
+
+<form class="message-box" action="/message/sent" method="post">
+  <label for="recepient">To:</label>
+  <select name="message_to" id="recepient" required>
+    <option value="" disabled selected>Select a recepient</option>
+    <% if (userList) { %>
+    <% userList.forEach( user => { %>
+        <option value="<%= user.account_id %>"><%=`${user.account_firstname} ${user.account_lastname}` %></option>
+    <% }) %>
+
+    <% } %>
+  </select>
+  <label for="message_subject">Subject:</label>
+  <input type="text" name="message_subject" id="message_subject" required>
+  <label for="message_body">Message:</label>
+  <textarea name="message_body" id="message_body" required></textarea>
+  <input type="hidden" name="message_from" value="<%= locals.accountData.account_id %>">
+
+  <button type="submit">Submit</button>
+</form>

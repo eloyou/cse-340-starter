@@ -139,7 +139,8 @@ Util.getUser = async (req, res, next) => {
   
 }
 
-Util.checkAdmin = (req, res, next) => {
+Util.checkAdmin = async (req, res, next) => {
+  
   const role = res.locals.accountData.account_type
   if (role == "Admin" || role == "Employee" ) {
     next()
