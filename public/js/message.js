@@ -1,120 +1,251 @@
-document.addEventListener("DOMContentLoaded", () => {
+async function countUnreadMessages() {
+    try {
+        const res = await fetch("/message/getmessages")
+        if (!res.ok) {
+            throw new Error("Network response was not ok")
+        }
+        
+        const messages = await res.json()
 
-    let msgInfoEl = document.getElementById("msg-info");
-    console.log(msgInfoEl)
+        let num = 0
 
-    const params = new URLSearchParams(window.location.search);
+        messages.forEach(msg => {
+            if (msg.message_read == false) {
+                num++
+            }
+        });
 
-    const id = +params.get("id");
+        if (num == 0) {
+            document.getElementById("count-unread").style.visibility = "hidden";
+        } else {
+            document.getElementById("count-unread").innerText = `There are ${num} unread ${num > 1 ? "messages" : "message"}.`
+        }
+    } catch (error) {
+        console.error("Error fetching data", error)
+    }
+}
+async function countArchiveMessages() {
+    try {
+        const res = await fetch("/message/getarchive")
+        if (!res.ok) {
+            throw new Error("Network response was not ok")
+        }
+        
+        const messages = await res.json()
 
-    fetch(`/message/getmessage?id=${id}`)
-        .then(res => {
-            if (!res.ok) throw new Error("Network response was not OK");
-            return res.json();
-        })
-        .then(data => {
-            buildMessageView(data)
-        })
-        .catch(err => {
-            msgInfoEl.innerHTML = "<p>Failed to load message.</p>";
-            console.error(err);
-        })
-})
-
-
-function buildMessageView(data) {
-    const messageInfo = document.getElementById("msg-info");
-
-
-    messageInfo.innerHTML = `
-        <p><span>Subject:</span> ${data.message_subject}</p>
-        <p><span>From:</span> ${data.account_firstname} ${data.account_lastname}</p>
-        <h2>Message:</h2>
-        <p>${data.message_body}</p>
-        <hr>
-
-        <div class="message-btns">
-            <a href="/message/inbox/${data.account_id}">Return to Inbox</a>
-            <button type="button" id="replyBtn">
-                Reply
-            </button>
-            <button type="button" id="markReadBtn">
-                ${data.message_read ? "Mark as Unread" : "Mark as Read"}
-            </button>
-            <button type="button" id="archiveBtn">
-                ${data.message_archive ? "Unarchive Message" : "Archive Message"}
-            </button>
-            <button type="button" id="deleteBtn">
-                Delete Message
-            </button>
-        </div>
-    `;
+        if (messages.length == 0) {
+            document.getElementById("archive-link").innerText= `There are no archived messages.`;
+        } else {
+            document.getElementById("archive-link").innerText = `There are ${messages.length} archived messages.`
+        }
+    } catch (error) {
+        console.error("Error fetching data", error)
+    }
+}
+async function buildInbox() {
+    try {
+        const res = await fetch("/message/getmessages")
+        if (!res.ok) {
+            throw new Error("Network response was not ok")
+        }
+        
+        const messages = await res.json()
 
 
-    document.getElementById("markReadBtn").addEventListener("click", () => {
-        toggleUpdateRead(data.message_id);
-    });
-
-    document.getElementById("archiveBtn").addEventListener("click", () => {
-        toggleArchiveRead(data.message_id);
-    });
-
-    document.getElementById("deleteBtn").addEventListener("click", () => {
-        deleteMessage(data.message_id, data.account_id);
-    });
-
+        inboxTable(messages);
+    
     
 
-};
-
-
-async function toggleUpdateRead(id) {
-   
-    const res = await fetch("/message/update", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: id })
-    })
-
-    const data = await res.json();
-
-    if (data.success) {
-        location.reload();
-    } else {
-        location.reload();
+    } catch (error) {
+        console.error("Error fetching data", error)
     }
+    
 }
 
-async function toggleArchiveRead(id) {
-   
-    const res = await fetch("/message/archived", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: id })
-    })
 
-    const data = await res.json();
 
-    if (data.success) {
-        location.reload();
-    } else {
-        location.reload();
+function inboxTable(messages) {
+    let template = `
+    <thead>
+        <tr>
+            <th>Received</th>
+            <th>Subject</th>
+            <th>From</th>
+            <th>Read</th>
+        </tr>
+    </thead>
+    <tbody>
+`;
+
+    if (messages.length === 0) {
+        template += `
+        <tr>
+            <td colspan="4">No messages to display.</td>
+        </tr>
+        `
     }
+
+    messages.forEach(msg => {
+        template += `
+        <tr>
+            <td>${new Date(msg.message_created).toLocaleString()}</td>
+            <td><a href="/message/content?id=${msg.message_id}">${msg.message_subject}</a></td>
+            <td>${msg.account_firstname} ${msg.account_lastname}</td>
+            <td>${msg.message_read ? 'Read' : 'Unread'}</td>
+        </tr>
+        `;
+    });
+
+    template += `
+    </tbody>
+    `;
+
+    document.getElementById("inbox-list").innerHTML = template;
 }
 
-async function deleteMessage(id, accountId) {
-   
-    const res = await fetch("/message/delete", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: id })
-    })
 
-    const data = await res.json();
+function markRead(id) {
 
-    if (data.success) {
-        window.location.href = `/message/inbox/${accountId}`;
-    } else {
-        location.reload();
+  const readBtn = document.getElementById("readBtn")
+
+  readBtn.addEventListener("click", async () => {
+    try {
+      const res = await fetch("/message/mark", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id })
+      })
+
+      if (!res.ok) throw new Error("Response not ok")
+
+      window.location.reload()
+
+    } catch (err) {
+      console.error("Fetch error:", err)
+    }
+  })
+}
+
+function markArchive(id) {
+
+  const archiveBtn = document.getElementById("archiveBtn")
+  archiveBtn.addEventListener("click", async () => {
+    try {
+      const res = await fetch("/message/archive", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id })
+      })
+
+      if (!res.ok) throw new Error("Response not ok")
+
+      window.location.reload()
+
+    } catch (err) {
+      console.error("Fetch error:", err)
+    }
+  })
+}
+
+async function deleteMessage(id) {
+    
+  const deleteBtn = document.getElementById("deleteBtn")
+  deleteBtn.addEventListener("click", async () => {
+    try {
+      const res = await fetch("/message/delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id })
+      })
+
+      if (!res.ok) throw new Error("Response not ok")
+      const data = await res.json()
+      window.location.href = `/message/inbox`
+
+    } catch (err) {
+      console.error("Fetch error:", err)
+    }
+  })
+}
+
+
+
+async function buttonMsgActions() {
+
+    const params = new URLSearchParams(window.location.search)
+    const id = params.get("id")
+    
+    
+    markArchive(id)
+    markRead(id)
+    deleteMessage(id)
+    
+}
+async function buildArchive() {
+    try {
+        const res = await fetch("/message/getarchive")
+        if (!res.ok) {
+            throw new Error("Network response was not ok")
+        }
+        
+        const messages = await res.json()
+        archiveTable(messages)
+    } catch (error) {
+        console.error("Error fetching data", error)
     }
 }
+function archiveTable(messages) {
+    let template = `
+        <thead>
+            <tr>
+                <th>Received</th>
+                <th>Subject</th>
+                <th>From</th>
+                <th>Read</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+
+    if (messages.length === 0) {
+        template += `
+        <tr>
+            <td colspan="5">No Archive to display.</td>
+        </tr>
+        `
+    }
+
+    messages.forEach(msg => {
+        template += `
+        <tr>
+            <td>${new Date(msg.message_created).toLocaleString()}</td>
+            <td><a href="/message/content?id=${msg.message_id}">${msg.message_subject}</a></td>
+            <td>${msg.account_firstname} ${msg.account_lastname}</td>
+            <td>${msg.message_read ? 'Read' : 'Unread'}</td>
+        </tr>
+        `;
+    });
+
+    template += `
+    </tbody>
+    `;
+
+    document.getElementById("archive-list").innerHTML = template;
+
+}
+
+
+countUnreadMessages()
+countArchiveMessages()
+buildInbox()
+buildArchive()
+buttonMsgActions()
+
+
+

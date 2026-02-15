@@ -592,6 +592,38 @@ input:focus:valid {
 .stack *{
   display: block;
 }
+
+.button-box > *{
+  display: block;
+  margin: 5px;
+  font-size: 1.2rem;
+}
+
+.msg-info > *{
+  display: block;
+  margin: 20px;
+}
+
+.msg-info p:last-child {
+  font-style: italic;
+  border: 2px solid black;
+  padding: 5px;
+}
+
+.msg-info span {
+  margin-right: 10px;
+}
+
+.reply-body > *{
+  margin: 20px;
+
+}
+
+.reply-body p {
+  font-style: italic;
+  background-color: rgb(213, 213, 131);
+  padding: 10px;
+}
 @media (max-width: 600px) {
     
     .product {flex-direction: column;}

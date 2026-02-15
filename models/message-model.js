@@ -10,16 +10,16 @@ async function getMessagesBySenderId(account_id) {
             m.message_read,
             m.message_id,
             a.account_firstname,
-            a.account_lastname
+            a.account_lastname,
+            a.account_id
         FROM public.message m
         JOIN public.account a
             ON m.message_from = a.account_id
-        WHERE m.message_to = $1
+        WHERE m.message_to = $1 AND m.message_archive = false
         `
 
         
         const data = await pool.query(sql, [account_id])
-
         return data.rows
     } catch (error) {
         console.error(error)
@@ -33,7 +33,7 @@ async function getUserList() {
         const sql = "SELECT account_id, account_firstname, account_lastname FROM public.account"
         const data = await pool.query(sql)
 
-        return data.rows
+        return data
     } catch (error) {
         console.error(error)
 
@@ -64,6 +64,8 @@ async function getMessageByMsgId(message_id) {
             m.message_created,
             m.message_read,
             m.message_id,
+            m.message_to,
+            m.message_from,
             m.message_archive,
             a.account_firstname,
             a.account_lastname,
@@ -91,9 +93,8 @@ async function updateMessageAsRead(msg_id) {
         
         `
 
-        const data = pool.query(sql, [msg_id])
+        const data = await pool.query(sql, [msg_id])
 
-        console.log(data)
         return data
     }catch (err) {
         console.error(err)
@@ -101,14 +102,14 @@ async function updateMessageAsRead(msg_id) {
     
 }
 
-async function updateArchiveRead(msg_id) {
+async function updateArchive(msg_id) {
     try {
         const sql = `
             UPDATE public.message SET message_archive = NOT message_archive WHERE message_id = $1 RETURNING *
         
         `
 
-        const data = pool.query(sql, [msg_id])
+        const data = await pool.query(sql, [msg_id])
 
         console.log(data)
         return data
@@ -125,9 +126,8 @@ async function deleteMessage(msg_id) {
         
         `
 
-        const data = pool.query(sql, [msg_id])
+        const data = await pool.query(sql, [msg_id])
 
-        console.log(data)
         return data
     }catch (err) {
         console.error(err)
@@ -135,4 +135,34 @@ async function deleteMessage(msg_id) {
     
 }
 
-module.exports = {getMessagesBySenderId, getUserList, postMessage, getMessageByMsgId, updateMessageAsRead, updateArchiveRead, deleteMessage}
+async function getArchivedMessages(account_id) {
+    try {
+        const sql = `
+        SELECT 
+            m.message_subject,
+            m.message_body,
+            m.message_created,
+            m.message_read,
+            m.message_id,
+            a.account_firstname,
+            a.account_lastname,
+            a.account_id
+        FROM public.message m
+        JOIN public.account a
+            ON m.message_from = a.account_id
+        WHERE m.message_to = $1 AND m.message_archive = true
+        `
+
+        
+        const data = await pool.query(sql, [account_id])
+        return data.rows
+    } catch (error) {
+        console.error(error)
+
+    }
+    
+}
+
+
+module.exports = {getMessagesBySenderId, getUserList, postMessage, getMessageByMsgId, updateMessageAsRead, updateArchive, deleteMessage, getArchivedMessages}
+

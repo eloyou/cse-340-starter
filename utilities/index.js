@@ -3,6 +3,7 @@ const Util = {}
 const jwt = require("jsonwebtoken")
 require("dotenv").config()
 const accountModel = require("../models/account-model")
+const msgModel = require("../models/message-model")
 
 /* ************************
  * Constructs the nav HTML unordered list
@@ -16,7 +17,7 @@ Util.getNav = async function (req, res, next) {
     list += "<li>"
     list +=
       '<a href="/inv/type/' +
-      row.classification_id +
+      row.user_id +
       '" title="See our inventory of ' +
       row.classification_name +
       ' vehicles">' +
@@ -77,23 +78,23 @@ Util.buildInventoryGrid = async function(data) {
 }
 Util.handleErrors = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
 
-Util.buildClassificationList = async function (classification_id = null) {
+Util.builduserList = async function (user_id = null) {
     let data = await invModel.getClassifications()
-    let classificationList =
-      '<select name="classification_id" id="classificationList" required >'
-    classificationList += "<option value=''>Choose a Classification</option>"
+    let userList =
+      '<select name="user_id" id="userList" required >'
+    userList += "<option value=''>Choose a Classification</option>"
     data.rows.forEach((row) => {
-      classificationList += '<option value="' + row.classification_id + '"'
+      userList += '<option value="' + row.user_id + '"'
       if (
-        classification_id != null &&
-        row.classification_id == classification_id
+        user_id != null &&
+        row.user_id == user_id
       ) {
-        classificationList += " selected "
+        userList += " selected "
       }
-      classificationList += ">" + row.classification_name + "</option>"
+      userList += ">" + row.classification_name + "</option>"
     })
-    classificationList += "</select>"
-    return classificationList
+    userList += "</select>"
+    return userList
   }
 
 Util.checkJWTToken = (req, res, next) => {
@@ -150,4 +151,25 @@ Util.checkAdmin = async (req, res, next) => {
     
   }
 }
+
+Util.buildUserList = async function (user_id = null) {
+    let data = await msgModel.getUserList()
+    let userList =
+      '<select name="message_to" id="userList" required >'
+    userList += "<option value=''>Choose a user</option>"
+    data.rows.forEach((row) => {
+      userList += '<option value="' + row.account_id + '"'
+      if (
+        user_id != null &&
+        row.account_id == user_id
+      ) {
+        userList += " selected "
+      }
+      userList += ">" + `${row.account_firstname} ${row.account_lastname}` + "</option>"
+    })
+    userList += "</select>"
+    
+    return userList
+  }
+
 module.exports = Util

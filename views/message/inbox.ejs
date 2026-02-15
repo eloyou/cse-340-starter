@@ -13,37 +13,14 @@
 <% } %>
 
 <ul class="inbox">
-    <li><a href="/message/new/<%= locals.user.account_id %>">Create new messages</a></li>
-    <li><a href="#">View 1 archive messages</a></li>
+    <li><a href="/message/new?user=<%= locals.accountData.account_id %>">Create new messages</a></li>
+    <li><a id="archive-link" href="/message/archive?user=<%= locals.accountData.account_id %>"></a></li>
 </ul>
 
-<table class="message-table">
-  <thead>
-    <tr>
-      <th>Recieved</th>
-      <th>Subject</th>
-      <th>From</th>
-      <th>Read</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% if (messageList.length > 1) { %>
-        <% messageList.forEach(message => { %>
-        <tr>
-            <td><%= `${new Date(message.message_created).toLocaleString()}` %></td>
-            <td><a href="/message/content?id=<%= message.message_id %>"><%= message.message_subject %></a></td>
-            <td><%= `${message.account_firstname} ${message.account_lastname}` %></td>
-            <td><%= message.message_read %></td>
-        </tr>
-        <% }) %>
+<table id="inbox-list" class="message-table">
 
-     <% } else { %>
-
-        <tr>
-            <td class="empty-inbox" colspan="4">Inbox is Empty!</td>
-        </tr>
-
-     <% } %>
-    
-  </tbody>
 </table>
+
+
+
+<script src="../../js/message.js"></script>

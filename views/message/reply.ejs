@@ -1,0 +1,32 @@
+<% if (title) {%>
+<h1><%= title %></h1>
+<% } %>
+
+<%- messages() %>
+
+<% if (errors) { %>
+  <ul class="notice">
+ <% errors.array().forEach(error => { %>
+   <li><%= error.msg %></li>
+<%  }) %>
+ </ul>
+<% } %>
+
+
+<div class="reply-body">
+    <h2>Reply to Message:</h2>
+    <p><%= messageData.message_body %></p>
+</div>
+
+
+
+<form class="message-box" action="/message/reply?id=<%= messageData.message_id %>" method="post">
+  <label for="reply_body">Message:</label>
+  <textarea name="reply_body" id="reply_body" required><%= locals.reply_body %></textarea>
+  <input type="hidden" name="reply_from" value="<%= messageData.message_to %>">
+  <input type="hidden" name="reply_to" value="<%= messageData.message_from %>">
+  <input type="hidden" name="reply_subject" value="Reply to: <%= messageData.message_body %>">  
+  <button type="submit">Submit</button>
+</form>
+
+<a href="/message/inbox?user=<%= locals.accountData.account_id %>">Return to Inbox</a>

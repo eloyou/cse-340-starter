@@ -20,19 +20,10 @@
     <hr>
     
     <h2>Message Center</h2>
-    <% if (messageList.length > 1) { %>
-    <% let numbersOfRead = 0; %>
-    <% messageList.forEach( message => { %>
-            <% if (message.message_read == false) { %>
-             <%   numbersOfRead++; %>
-            <% } %>   
-    <% }) %>
+    
+    <p id="count-unread"></p>
 
-     <p>You have <%= numbersOfRead %> unread messages</p>
-    <%} %>
-   
-  
-    <a href="/message/inbox/<%= locals.account_id%>">Go to inbox </a>
+    <a href="/message/inbox?user=<%= locals.account_id%>">Go to inbox </a>
 
     <% let role = locals.accountData.account_type %>
     <% if (role == "Admin" || role == "Employee") { %>
@@ -41,3 +32,6 @@
     <% } %>
 
 </div>
+
+
+<script src="../../js/message.js"></script>

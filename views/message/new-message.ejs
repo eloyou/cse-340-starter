@@ -14,22 +14,16 @@
 
 <p>This is an internal system only. Recipents are limited to the three generic accounts. </p>
 
-<form class="message-box" action="/message/sent" method="post">
+<form class="message-box" action="/message/send" method="post">
   <label for="recepient">To:</label>
-  <select name="message_to" id="recepient" required>
-    <option value="" disabled selected>Select a recepient</option>
-    <% if (userList) { %>
-    <% userList.forEach( user => { %>
-        <option value="<%= user.account_id %>"><%=`${user.account_firstname} ${user.account_lastname}` %></option>
-    <% }) %>
-
-    <% } %>
-  </select>
+  <%- userList %>
   <label for="message_subject">Subject:</label>
-  <input type="text" name="message_subject" id="message_subject" required>
+  <input type="text" name="message_subject" id="message_subject" required value="<%= locals.message_subject %>">
   <label for="message_body">Message:</label>
-  <textarea name="message_body" id="message_body" required></textarea>
+  <textarea name="message_body" id="message_body" required><%= locals.message_body %></textarea>
   <input type="hidden" name="message_from" value="<%= locals.accountData.account_id %>">
 
   <button type="submit">Submit</button>
 </form>
+
+<a href="/message/inbox?user=<%= locals.accountData.account_id %>">Return to Inbox</a>

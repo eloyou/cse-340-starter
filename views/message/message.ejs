@@ -11,7 +11,26 @@
 <%  }) %>
  </ul>
 <% } %>
+<div class="msg-info">
+  <p><span>Subject:</span><%= messageData.message_subject %></p>
+  <p><span>From:</span><%= messageData.account_firstname + " " + messageData.account_lastname %></p>
 
-<div id="msg-info"></div>
+  <h2>Message:</h2>
+  <p><%= messageData.message_body %></p>
+
+
+</div>
+
+<hr>
+
+<div class="button-box">
+  <a href="/message/inbox?user=<%= locals.accountData.account_id %>">Return to Inbox</a>
+  <button type="button" onclick="window.location.href='/message/reply/<%= locals.accountData.account_id %>/content/<%= messageData.message_id %>'" id="replyBtn">Reply</button>
+  <button type="button" id="readBtn"><%= messageData.message_read ? "Mark as Unread" : "Mark as Read" %></button>
+  <button type="button" id="archiveBtn"><%= messageData.message_archive ? "Unarchive Message" : "Archive Message" %></button>
+  <button type="button" id="deleteBtn">Delete</button>
+</div>
+
+
 
 <script src="../../js/message.js"></script>

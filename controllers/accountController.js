@@ -115,18 +115,26 @@ async function accountLogin(req,res) {
 
 async function buildManagement(req,res) {
     let nav = await utilities.getNav()
-    const accountId = req.params.accountId
-    const messagesData = await msgModel.getMessagesBySenderId(accountId)
+    const accountId = parseInt(req.params.accountId)
     const accountData = await accountModel.getAccountById(accountId)
-    res.render("account/management", {
+
+    if (!accountData){
+        next(new Error("No data returned"))
+    } else {
+
+        res.render("account/management", {
         title: "Account Management",
         nav,
         errors: null,
         account_firstname: accountData.account_firstname,
         account_id: accountData.account_id,
-        messageList: messagesData
 
-    })
+      })
+        
+    }
+    
+
+
     
 }
 

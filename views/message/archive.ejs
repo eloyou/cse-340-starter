@@ -1,0 +1,22 @@
+<% if (title) {%>
+<h1><%= title %></h1>
+<% } %>
+
+<%- messages() %>
+
+<% if (errors) { %>
+  <ul class="notice">
+ <% errors.array().forEach(error => { %>
+   <li><%= error.msg %></li>
+<%  }) %>
+ </ul>
+<% } %>
+
+
+<p>This is the archive for your messages. </p>
+
+<table id="archive-list" class="message-table"></table>
+
+<a href="/message/inbox?user=<%= locals.accountData.account_id %>">Return to Inbox</a>
+
+<script src="/js/message.js"></script>

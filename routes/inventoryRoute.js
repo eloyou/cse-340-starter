@@ -9,11 +9,13 @@ router.get("/detail/:inventoryId", utilities.handleErrors(invController.buildByI
 router.get("/", utilities.checkLogin, utilities.checkAdmin, utilities.handleErrors(invController.buildManagement))
 router.get("/add-classification",utilities.checkLogin, utilities.checkAdmin, utilities.handleErrors(invController.buildAddClassification))
 router.post("/add-classification", 
+    utilities.checkLogin,
     invValidator.classificationNameRules(),
     invValidator.checkClassificationData,
     utilities.handleErrors(invController.registerClassification))
 router.get("/add-inventory", utilities.checkLogin, utilities.checkAdmin, utilities.handleErrors(invController.buildAddInventory))
 router.post("/add-inventory", 
+    utilities.checkLogin,
     invValidator.inventoryRules(),
     invValidator.checkInventoryData,
     utilities.handleErrors(invController.registerInventory))
@@ -21,10 +23,11 @@ router.post("/add-inventory",
 router.get("/getInventory/:classification_id", utilities.checkLogin, utilities.checkAdmin, utilities.handleErrors(invController.getInventoryJSON))
 router.get("/edit/:inventoryId", utilities.checkLogin, utilities.checkAdmin, utilities.handleErrors(invController.editInventoryView))
 router.post("/update/",
+    utilities.checkLogin,
     invValidator.inventoryRules(),
     invValidator.checkUpdateData,
     invController.updateInventory)
 
 router.get("/delete/:inventoryId", utilities.checkLogin, utilities.checkAdmin, utilities.handleErrors(invController.buildDeleteView))
-router.post("/delete-inventory", utilities.handleErrors(invController.deleteInventory))
+router.post("/delete-inventory", utilities.checkLogin, utilities.handleErrors(invController.deleteInventory))
 module.exports = router
